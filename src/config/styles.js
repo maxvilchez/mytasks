@@ -22,7 +22,7 @@ export const FormContent = styled.View`
 `;
 
 export const InputContent = styled.View`
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 `;
 
 export const Footer = styled.View`
