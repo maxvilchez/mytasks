@@ -17,10 +17,12 @@
     "appcenter": "3.0.2",
     "appcenter-analytics": "3.0.2",
     "appcenter-crashes": "3.0.2",
+    "formik": "^2.1.4",
     "js-base64": "^2.5.2",
     "react": "16.11.0",
     "react-native": "0.62.1",
     "react-native-gesture-handler": "^1.6.1",
+    "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-paper": "^3.7.0",
     "react-native-reanimated": "^1.7.1",
     "react-native-safe-area-context": "^0.7.3",
@@ -30,7 +32,7 @@
     "realm": "^5.0.3",
     "redux": "^4.0.5",
     "styled-components": "^5.0.1",
-    "tcomb-form-native": "^0.6.20"
+    "yup": "^0.28.4"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",

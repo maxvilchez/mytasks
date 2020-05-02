@@ -5,10 +5,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import {actionSignIn, actionSessionLoading} from '../actions';
 
+import ProfileButton from './../components/ProfileButton';
+
 import SignInScreen from './SignInScreen';
 import SignUpScreen from './SignUpScreen';
 
 import HomeScreen from './HomeScreen';
+import ProfileScreen from './ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -45,7 +48,14 @@ export default function InitialScreen() {
       <Stack.Navigator>
         {signIn.isSignedIn ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={({navigation}) => ({
+                headerRight: props => <ProfileButton {...navigation} />,
+              })}
+            />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
           <>

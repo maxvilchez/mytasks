@@ -1,11 +1,13 @@
 import Realm from 'realm';
 
-import UserSchema from './../schemas/UserSchema';
+import UsersSchema from './../schemas/UsersSchema';
+import TasksSchema from './../schemas/TasksSchema';
+import StatusSchema from './../schemas/StatusSchema';
 
 export default function getRealm() {
   return Realm.open({
     path: 'mytasks.realm',
-    schema: [UserSchema],
+    schema: [StatusSchema, TasksSchema, UsersSchema],
     schemaVersion: 1,
   });
 }
