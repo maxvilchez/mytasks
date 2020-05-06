@@ -30,3 +30,12 @@ export function getStatusBarHeight(safe) {
 export function getBottomSpace() {
   return isIphoneX() ? 34 : 0;
 }
+
+export const calendarFormats = {
+  sameDay: '[Today]',
+  nextDay: '[Tomorrow]',
+  nextWeek: 'dddd',
+  lastDay: '[Yesterday]',
+  lastWeek: '[Last] dddd',
+  sameElse: 'DD/MM/YYYY',
+};

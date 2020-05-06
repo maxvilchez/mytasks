@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
+import {Provider as PaperProvider} from 'react-native-paper';
 
 import InitialScreen from './src/screens/InitialScreen';
 
@@ -12,7 +13,9 @@ export default function App() {
     <>
       <Provider store={store}>
         <NavigationContainer>
-          <InitialScreen />
+          <PaperProvider>
+            <InitialScreen />
+          </PaperProvider>
         </NavigationContainer>
       </Provider>
     </>

@@ -1,50 +1,42 @@
 import React from 'react';
-import {Alert, ToastAndroid, Platform} from 'react-native';
-import {HelperText, TextInput} from 'react-native-paper';
+import {Alert} from 'react-native';
+import {HelperText, TextInput, Button} from 'react-native-paper';
 import {Base64} from 'js-base64';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-import {
-  Container,
-  CenterContent,
-  FormContent,
-  InputContent,
-  Title,
-  BPrimaryLogin,
-} from '../config/styles';
-import {SignUpSchema} from '../config/validations';
-import getRealm from '../services/realm';
-import {actionSignIn} from '../actions';
+import {Container, CenterContent, Form, FormControl, Title} from './styles';
+import {SignUpSchema} from '../../config/validations';
+import realm from '../../services/realm';
+import {actionSignIn} from '../../actions';
 
 export default function SignUpScreen(props) {
   const dispatch = useDispatch();
   const [id, setId] = React.useState(1);
 
   React.useEffect(function() {
-    async function getUsers() {
-      const realm = await getRealm();
+    async function setUserId() {
       const users = realm.objects('Users');
       if (users.length > 0) {
         setId(users.length + 1);
       }
     }
-    getUsers();
+    setUserId();
   }, []);
 
   async function _handleSignUp(values) {
     try {
       if (values) {
         const password = Base64.encode(values.password);
+
         const data = {
           ...values,
           password,
           id,
         };
-        console.log(data);
-        const realm = await getRealm();
+
         realm.write(function() {
           realm.create('Users', data);
         });
@@ -52,16 +44,7 @@ export default function SignUpScreen(props) {
         const storage = JSON.stringify({email: values.email, id});
         await AsyncStorage.setItem('@mytasks', storage);
 
-        if (Platform.OS === 'android') {
-          ToastAndroid.show(
-            'You are registered successfully',
-            ToastAndroid.SHORT,
-          );
-        } else {
-          Alert.alert('MyTasks', 'You are registered successfully');
-        }
-
-        dispatch(actionSignIn(true));
+        dispatch(actionSignIn({signIn: true, user: data}));
       }
     } catch (err) {
       Alert.alert('Error', err.message);
@@ -71,8 +54,8 @@ export default function SignUpScreen(props) {
   return (
     <Container>
       <CenterContent>
-        <Title>Create Account</Title>
-        <FormContent>
+        <Title>Crear cuenta</Title>
+        <Form>
           <KeyboardAwareScrollView>
             <Formik
               initialValues={{email: '', password: ''}}
@@ -80,85 +63,87 @@ export default function SignUpScreen(props) {
               validationSchema={SignUpSchema}>
               {({handleChange, values, handleSubmit, errors, isValid}) => (
                 <>
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="fullname"
                       value={values.fullname}
                       onChangeText={handleChange('fullname')}
-                      label="Full Name"
+                      label="Nombres completos"
+                      mode="outlined"
                     />
                     <HelperText type="error" visible>
                       {errors.fullname}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="email"
                       value={values.email}
                       onChangeText={handleChange('email')}
                       label="Email"
+                      mode="outlined"
                       autoCapitalize="none"
                     />
                     <HelperText type="error" visible>
                       {errors.email}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="age"
                       value={values.age}
                       onChangeText={handleChange('age')}
-                      label="Age"
+                      label="Edad"
+                      mode="outlined"
                       keyboardType="numeric"
                       maxLength={2}
                     />
                     <HelperText type="error" visible>
                       {errors.age}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="phone"
                       value={values.phone}
                       onChangeText={handleChange('phone')}
-                      label="Phone"
+                      label="Celular"
+                      mode="outlined"
                       keyboardType="phone-pad"
                       maxLength={9}
                     />
                     <HelperText type="error" visible>
                       {errors.phone}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="password"
                       value={values.password}
                       onChangeText={handleChange('password')}
                       maxLength={8}
                       secureTextEntry
-                      label="Password"
+                      label="Contraseña"
+                      mode="outlined"
                       keyboardType="numeric"
                     />
                     <HelperText type="error" visible>
                       {errors.password}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <BPrimaryLogin
-                    mode="outlined"
-                    onPress={handleSubmit}
-                    disabled={!isValid}>
-                    Sign Up
-                  </BPrimaryLogin>
+                  <Button onPress={handleSubmit} disabled={!isValid}>
+                    Registrarme
+                  </Button>
                 </>
               )}
             </Formik>
           </KeyboardAwareScrollView>
-        </FormContent>
+        </Form>
       </CenterContent>
     </Container>
   );
