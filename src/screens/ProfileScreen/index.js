@@ -1,6 +1,12 @@
 import React from 'react';
 import {TouchableOpacity, Alert, Platform, ToastAndroid} from 'react-native';
-import {Avatar, TextInput, HelperText, IconButton} from 'react-native-paper';
+import {
+  Avatar,
+  HelperText,
+  IconButton,
+  TextInput,
+  Button,
+} from 'react-native-paper';
 import {Formik} from 'formik';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -9,18 +15,17 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
   Container,
   Section,
-  HeaderProfile,
-  FullNmae,
-  FormContent,
-  InputContent,
+  Header,
+  FullName,
+  Form,
+  FormControl,
   ChangePasswordText,
-  BPrimary,
-} from './../config/styles';
-import {ProfileSchema} from '../config/validations';
-import getRealm from '../services/realm';
-import {actionSignIn} from '../actions';
+} from './styles';
+import {ProfileSchema} from '../../config/validations';
+import realm from '../../services/realm';
+import {actionSignIn} from '../../actions';
 
-function ProfileScreen(props) {
+const ProfileScreen = props => {
   const dispatch = useDispatch();
   const [profile, setProfile] = React.useState(null);
   const [user, setUser] = React.useState(null);
@@ -38,13 +43,13 @@ function ProfileScreen(props) {
     function _logout() {
       Alert.alert(
         'MyTasks',
-        "¿I'm sure you want to log out?",
+        '¿Seguro que quiere cerrar sesión?',
         [
           {
-            text: 'Cancel',
+            text: 'Cancelar',
             style: 'cancel',
           },
-          {text: 'Yes', onPress: _removeSession},
+          {text: 'Si', onPress: _removeSession},
         ],
         {cancelable: false},
       );
@@ -62,8 +67,6 @@ function ProfileScreen(props) {
         const value = await AsyncStorage.getItem('@mytasks');
         const userLoggedIn = JSON.parse(value);
         if (userLoggedIn) {
-          const realm = await getRealm();
-
           const data = realm
             .objects('Users')
             .filter(item => item.id === userLoggedIn.id);
@@ -86,7 +89,6 @@ function ProfileScreen(props) {
   async function _handleSave(values) {
     try {
       if (values) {
-        const realm = await getRealm();
         realm.write(function() {
           realm.create('Users', {id: user.id, ...values}, 'modified');
         });
@@ -96,11 +98,11 @@ function ProfileScreen(props) {
 
         if (Platform.OS === 'android') {
           ToastAndroid.show(
-            'You are registered successfully',
+            'Tus datos fueron actualizados',
             ToastAndroid.SHORT,
           );
         } else {
-          Alert.alert('MyTasks', 'Your data was updates');
+          Alert.alert('MyTasks', 'Tus datos fueron actualizados');
         }
       }
     } catch (err) {
@@ -112,11 +114,11 @@ function ProfileScreen(props) {
     <Container>
       <KeyboardAwareScrollView>
         <Section>
-          <HeaderProfile>
+          <Header>
             <Avatar.Icon size={80} icon="account" />
-            <FullNmae>{profile && profile.fullname}</FullNmae>
-          </HeaderProfile>
-          <FormContent>
+            <FullName>{profile && profile.fullname}</FullName>
+          </Header>
+          <Form>
             <Formik
               enableReinitialize
               initialValues={profile ? profile : {}}
@@ -124,36 +126,39 @@ function ProfileScreen(props) {
               validationSchema={ProfileSchema}>
               {({handleChange, values, handleSubmit, errors, isValid}) => (
                 <>
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="fullname"
                       value={values.fullname}
-                      label="Full Name"
+                      label="Nombre completo"
+                      mode="outlined"
                       onChangeText={handleChange('fullname')}
                     />
                     <HelperText type="error" visible>
                       {errors.fullname}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="email"
                       value={values.email}
                       label="Email"
+                      mode="outlined"
                       onChangeText={handleChange('email')}
                       autoCapitalize="none"
                     />
                     <HelperText type="error" visible>
                       {errors.email}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="age"
                       value={values.age}
-                      label="Age"
+                      label="Edad"
+                      mode="outlined"
                       onChangeText={handleChange('age')}
                       keyboardType="numeric"
                       maxLength={2}
@@ -161,13 +166,14 @@ function ProfileScreen(props) {
                     <HelperText type="error" visible>
                       {errors.age}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TextInput
                       name="phone"
                       value={values.phone}
-                      label="Phone"
+                      label="Celular"
+                      mode="outlined"
                       onChangeText={handleChange('phone')}
                       keyboardType="phone-pad"
                       maxLength={9}
@@ -175,24 +181,27 @@ function ProfileScreen(props) {
                     <HelperText type="error" visible>
                       {errors.phone}
                     </HelperText>
-                  </InputContent>
+                  </FormControl>
 
-                  <InputContent>
+                  <FormControl>
                     <TouchableOpacity onPress={() => {}}>
-                      <ChangePasswordText>Change Password</ChangePasswordText>
+                      <ChangePasswordText>
+                        Cambiar contraseña
+                      </ChangePasswordText>
                     </TouchableOpacity>
-                  </InputContent>
-                  <BPrimary onPress={handleSubmit} disabled={!isValid}>
-                    Save
-                  </BPrimary>
+                  </FormControl>
+
+                  <Button onPress={handleSubmit} disabled={!isValid}>
+                    Guardar
+                  </Button>
                 </>
               )}
             </Formik>
-          </FormContent>
+          </Form>
         </Section>
       </KeyboardAwareScrollView>
     </Container>
   );
-}
+};
 
 export default ProfileScreen;

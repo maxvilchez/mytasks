@@ -9,7 +9,6 @@ export default class UsersSchema {
       age: 'string?',
       phone: 'string?',
       password: 'string',
-      tasks: 'Tasks[]',
     },
   };
 }

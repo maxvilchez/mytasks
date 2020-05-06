@@ -24,9 +24,9 @@ export default function InitialScreen() {
       async function bootstrapAsync() {
         try {
           const value = await AsyncStorage.getItem('@mytasks');
-          const userLoggedIn = JSON.parse(value);
-          if (userLoggedIn) {
-            dispatch(actionSignIn(true));
+          const user = JSON.parse(value);
+          if (user) {
+            dispatch(actionSignIn({signIn: true, user}));
           } else {
             dispatch(actionSessionLoading(false));
           }

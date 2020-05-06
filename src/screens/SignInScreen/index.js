@@ -1,40 +1,45 @@
 import React from 'react';
 import {Alert} from 'react-native';
-import {Button, TextInput, HelperText} from 'react-native-paper';
+import {HelperText, TextInput, Button} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
+import _ from 'lodash';
+import {Base64} from 'js-base64';
 
 import {
   Container,
-  BPrimaryLogin,
-  FormContent,
-  InputContent,
+  Form,
+  FormControl,
   Footer,
   Title,
   SubTitle,
   CenterContent,
-} from '../config/styles';
-import {SignInSchema} from '../config/validations';
-import {actionSignIn} from '../actions';
-import getRealm from '../services/realm';
+} from '../../config/styles';
+import {SignInSchema} from '../../config/validations';
+import {actionSignIn} from '../../actions';
+import realm from '../../services/realm';
 
-export default function SignInScreen(props) {
+const SignInScreen = props => {
   const dispatch = useDispatch();
 
   async function _handleSignIn(values) {
-    console.log(values);
     try {
       if (values) {
-        const realm = await getRealm();
         const users = realm.objects('Users');
 
-        console.log(users);
+        const user = _.filter(users, u => {
+          const pw = Base64.decode(u.password);
+          return u.email === values.email && pw === values.password;
+        });
 
-        const storage = JSON.stringify({email: values.email});
-        await AsyncStorage.setItem('@mytasks', storage);
-
-        dispatch(actionSignIn(true));
+        if (user.length > 0) {
+          const storage = JSON.stringify({email: values.email, id: user[0].id});
+          await AsyncStorage.setItem('@mytasks', storage);
+          dispatch(actionSignIn({signIn: true, user: user[0]}));
+        } else {
+          Alert.alert('MyTasks', 'Datos invalidos');
+        }
       }
     } catch (err) {
       Alert.alert('Error', err.message);
@@ -44,57 +49,58 @@ export default function SignInScreen(props) {
   return (
     <Container>
       <CenterContent>
-        <Title>Login</Title>
-        <SubTitle>Please sign in to continue</SubTitle>
-        <FormContent>
+        <Title>Iniciar Sesión</Title>
+        <SubTitle>Por favor inicie sesión para continuar</SubTitle>
+        <Form>
           <Formik
             initialValues={{email: '', password: ''}}
             onSubmit={_handleSignIn}
             validationSchema={SignInSchema}>
             {({handleChange, values, handleSubmit, errors, isValid}) => (
               <>
-                <InputContent>
+                <FormControl>
                   <TextInput
                     name="email"
                     value={values.email}
                     onChangeText={handleChange('email')}
                     label="Email"
+                    mode="outlined"
                     autoCapitalize="none"
                   />
                   <HelperText type="error" visible>
                     {errors.email}
                   </HelperText>
-                </InputContent>
-                <InputContent>
+                </FormControl>
+                <FormControl>
                   <TextInput
                     name="password"
                     value={values.password}
                     onChangeText={handleChange('password')}
                     maxLength={8}
                     secureTextEntry
-                    label="Password"
+                    label="Contraseña"
+                    mode="outlined"
                     keyboardType="numeric"
                   />
                   <HelperText type="error" visible>
                     {errors.password}
                   </HelperText>
-                </InputContent>
-                <BPrimaryLogin
-                  mode="outlined"
-                  onPress={handleSubmit}
-                  disabled={!isValid}>
-                  Sign In
-                </BPrimaryLogin>
+                </FormControl>
+                <Button onPress={handleSubmit} disabled={!isValid}>
+                  Iniciar Sesión
+                </Button>
               </>
             )}
           </Formik>
-        </FormContent>
+        </Form>
       </CenterContent>
       <Footer>
         <Button onPress={() => props.navigation.navigate('SignUp')}>
-          Don't have as account? sign up
+          ¿No tienes una cuenta? registrate
         </Button>
       </Footer>
     </Container>
   );
-}
+};
+
+export default SignInScreen;
