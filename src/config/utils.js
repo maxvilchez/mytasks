@@ -1,7 +1,7 @@
-import {Dimensions, Platform, StatusBar} from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native'
 
-export function isIphoneX() {
-  const dimen = Dimensions.get('window');
+export function isIphoneX () {
+  const dimen = Dimensions.get('window')
   return (
     Platform.OS === 'ios' &&
     !Platform.isPad &&
@@ -9,26 +9,26 @@ export function isIphoneX() {
     (dimen.height === 812 ||
       dimen.width === 812 ||
       (dimen.height === 896 || dimen.width === 896))
-  );
+  )
 }
 
-export function ifIphoneX(iphoneXStyle, regularStyle) {
+export function ifIphoneX (iphoneXStyle, regularStyle) {
   if (isIphoneX()) {
-    return iphoneXStyle;
+    return iphoneXStyle
   }
-  return regularStyle;
+  return regularStyle
 }
 
-export function getStatusBarHeight(safe) {
+export function getStatusBarHeight (safe) {
   return Platform.select({
     ios: ifIphoneX(safe ? 44 : 30, 20),
     android: StatusBar.currentHeight,
-    default: 0,
-  });
+    default: 0
+  })
 }
 
-export function getBottomSpace() {
-  return isIphoneX() ? 34 : 0;
+export function getBottomSpace () {
+  return isIphoneX() ? 34 : 0
 }
 
 export const calendarFormats = {
@@ -37,5 +37,5 @@ export const calendarFormats = {
   nextWeek: 'dddd',
   lastDay: '[Yesterday]',
   lastWeek: '[Last] dddd',
-  sameElse: 'DD/MM/YYYY',
-};
+  sameElse: 'DD/MM/YYYY'
+}

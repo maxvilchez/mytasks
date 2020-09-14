@@ -1,4 +1,31 @@
 module.exports = {
-  root: true,
-  extends: '@react-native-community',
-};
+  env: {
+    browser: true,
+    es6: true,
+    node: true
+  },
+  extends: [
+    'plugin:react/recommended',
+    'standard'
+  ],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly'
+  },
+  parser: 'babel-eslint',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
+  plugins: [
+    'react'
+  ],
+  rules: {
+    'react/prop-types': 'off',
+    'react/display-name': 'off',
+    'prefer-const': 'off'
+  }
+}

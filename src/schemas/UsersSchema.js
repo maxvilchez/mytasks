@@ -3,12 +3,12 @@ export default class UsersSchema {
     name: 'Users',
     primaryKey: 'id',
     properties: {
-      id: {type: 'int', indexed: true},
+      id: { type: 'int', indexed: true },
       fullname: 'string',
       email: 'string',
       age: 'string?',
       phone: 'string?',
-      password: 'string',
-    },
+      password: 'string'
+    }
   };
 }

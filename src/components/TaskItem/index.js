@@ -1,6 +1,6 @@
-import React from 'react';
-import {Checkbox} from 'react-native-paper';
-import moment from 'moment';
+import React from 'react'
+import { Checkbox } from 'react-native-paper'
+import moment from 'moment'
 
 import {
   Container,
@@ -9,10 +9,10 @@ import {
   Content,
   Case,
   Description,
-  TimeText,
-} from './styles';
+  TimeText
+} from './styles'
 
-function TaskItem({details}) {
+export default function TaskItem ({ details }) {
   return (
     <Container>
       <ContentLeft>
@@ -26,7 +26,5 @@ function TaskItem({details}) {
         <TimeText>{moment(details.date).format('LT')}</TimeText>
       </ContentRight>
     </Container>
-  );
+  )
 }
-
-export default TaskItem;

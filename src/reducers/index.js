@@ -1,11 +1,11 @@
-import {combineReducers} from 'redux';
-import {SIGN_IN, SESSION_LOADING} from '../actions';
+import { combineReducers } from 'redux'
+import { SIGN_IN, SESSION_LOADING } from '../actions'
 
 const initialState = {
   isSignedIn: false,
   isLoading: true,
-  user: null,
-};
+  user: null
+}
 
 const signIn = (state = initialState, action) => {
   switch (action.type) {
@@ -13,17 +13,17 @@ const signIn = (state = initialState, action) => {
       return Object.assign({}, state, {
         isSignedIn: action.payload.signIn,
         isLoading: false,
-        user: action.payload.user,
-      });
+        user: action.payload.user
+      })
     case SESSION_LOADING:
       return Object.assign({}, state, {
-        isLoading: action.payload,
-      });
+        isLoading: action.payload
+      })
     default:
-      return state;
+      return state
   }
-};
+}
 
 export default combineReducers({
-  signIn,
-});
+  signIn
+})

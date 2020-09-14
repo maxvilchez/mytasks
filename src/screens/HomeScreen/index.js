@@ -1,12 +1,12 @@
-import React from 'react';
-import {Modal, Platform, Keyboard} from 'react-native';
-import {TextInput, HelperText, Button} from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
-import {Formik} from 'formik';
-import _ from 'lodash';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSelector} from 'react-redux';
+import React from 'react'
+import { Modal, Platform, Keyboard } from 'react-native'
+import { TextInput, HelperText, Button } from 'react-native-paper'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import moment from 'moment'
+import { Formik } from 'formik'
+import _ from 'lodash'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useSelector } from 'react-redux'
 
 import {
   Container,
@@ -22,71 +22,71 @@ import {
   Form,
   FormControl,
   SectionList,
-  SectionTitle,
-} from './styles';
-import realm from '../../services/realm';
-import {NewTasksSchema} from '../../config/validations';
-import {calendarFormats} from '../../config/utils';
+  SectionTitle
+} from './styles'
+import realm from '../../services/realm'
+import { NewTasksSchema } from '../../config/validations'
+import { calendarFormats } from '../../config/utils'
 
-import TaskItem from './../../components/TaskItem';
+import TaskItem from './../../components/TaskItem'
 
 const HomeScreen = () => {
-  const {user} = useSelector(state => state.signIn);
+  const { user } = useSelector(state => state.signIn)
 
-  const [modal, setModal] = React.useState(false);
-  const [date, setDate] = React.useState(new Date());
-  const [showDateTime, setShowDateTime] = React.useState(false);
-  const [tasks, setTasks] = React.useState([]);
+  const [modal, setModal] = React.useState(false)
+  const [date, setDate] = React.useState(new Date())
+  const [showDateTime, setShowDateTime] = React.useState(false)
+  const [tasks, setTasks] = React.useState([])
 
   React.useLayoutEffect(() => {
-    const data = realm.objects('Tasks');
+    const data = realm.objects('Tasks')
     data.addListener((t, changes) => {
       _.forEach(changes.insertions, index => {
-        const d = _.orderBy(t, ['date'], ['asc']);
-        _tasksMapping(d);
-      });
-    });
-  }, [tasks]);
+        const d = _.orderBy(t, ['date'], ['asc'])
+        _tasksMapping(d)
+      })
+    })
+  }, [tasks])
 
   React.useEffect(() => {
-    const data = realm.objects('Tasks').sorted('date');
-    _tasksMapping(data);
+    const data = realm.objects('Tasks').sorted('date')
+    _tasksMapping(data)
     return () => {
-      data.removeAllListeners();
-    };
-  }, []);
+      data.removeAllListeners()
+    }
+  }, [])
 
   const _tasksMapping = data => {
     const groups = _.groupBy(data, task =>
-      moment(task.date).calendar(calendarFormats),
-    );
+      moment(task.date).calendar(calendarFormats)
+    )
 
-    let tsks = [];
+    const tsks = []
 
     _.forEach(groups, (value, key) => {
-      let item;
+      let item
       item = _.assign(item, {
         title: key,
-        data: groups[key],
-      });
-      tsks.push(item);
-    });
+        data: groups[key]
+      })
+      tsks.push(item)
+    })
 
-    setTasks(tsks);
-  };
+    setTasks(tsks)
+  }
 
   const closeModal = () => {
-    setModal(false);
-    setDate(new Date());
-    setShowDateTime(false);
-  };
+    setModal(false)
+    setDate(new Date())
+    setShowDateTime(false)
+  }
 
   const save = values => {
-    const totalTasks = realm.objects('Tasks').length;
+    const totalTasks = realm.objects('Tasks').length
 
-    let id = 1;
+    let id = 1
     if (totalTasks > 0) {
-      id = totalTasks + 1;
+      id = totalTasks + 1
     }
 
     const data = {
@@ -95,29 +95,29 @@ const HomeScreen = () => {
       case_num: '001',
       description: values.description,
       date,
-      create_date: new Date(),
-    };
+      create_date: new Date()
+    }
 
-    realm.write(function() {
-      realm.create('Tasks', data);
-    });
+    realm.write(function () {
+      realm.create('Tasks', data)
+    })
 
-    closeModal();
-  };
+    closeModal()
+  }
 
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDateTime(Platform.OS === 'ios');
-    setDate(currentDate);
-  };
+    const currentDate = selectedDate || date
+    setShowDateTime(Platform.OS === 'ios')
+    setDate(currentDate)
+  }
 
   return (
     <Container>
       <SectionList
         sections={tasks}
         keyExtractor={item => item.id}
-        renderItem={({item}) => <TaskItem details={item} />}
-        renderSectionHeader={({section: {title}}) => (
+        renderItem={({ item }) => <TaskItem details={item} />}
+        renderSectionHeader={({ section: { title } }) => (
           <SectionTitle>{title}</SectionTitle>
         )}
       />
@@ -132,10 +132,10 @@ const HomeScreen = () => {
             <CenterContent>
               <Form>
                 <Formik
-                  initialValues={{description: ''}}
+                  initialValues={{ description: '' }}
                   onSubmit={save}
                   validationSchema={NewTasksSchema}>
-                  {({handleChange, values, handleSubmit, errors, isValid}) => (
+                  {({ handleChange, values, handleSubmit, errors, isValid }) => (
                     <>
                       <TextInput
                         label="¿Cuáles son sus planes?"
@@ -154,8 +154,8 @@ const HomeScreen = () => {
                         <TextButton
                           onPress={() =>
                             setShowDateTime(() => {
-                              Keyboard.dismiss();
-                              return true;
+                              Keyboard.dismiss()
+                              return true
                             })
                           }>
                           <TextButtonTitle>
@@ -193,7 +193,7 @@ const HomeScreen = () => {
         </ModalContainer>
       </Modal>
     </Container>
-  );
-};
+  )
+}
 
-export default HomeScreen;
+export default HomeScreen

@@ -1,53 +1,53 @@
-import React from 'react';
-import {Alert} from 'react-native';
-import {HelperText, TextInput, Button} from 'react-native-paper';
-import {Base64} from 'js-base64';
-import {useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
-import {Formik} from 'formik';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import React from 'react'
+import { Alert } from 'react-native'
+import { HelperText, TextInput, Button } from 'react-native-paper'
+import { Base64 } from 'js-base64'
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-community/async-storage'
+import { Formik } from 'formik'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import {Container, CenterContent, Form, FormControl, Title} from './styles';
-import {SignUpSchema} from '../../config/validations';
-import realm from '../../services/realm';
-import {actionSignIn} from '../../actions';
+import { Container, CenterContent, Form, FormControl, Title } from './styles'
+import { SignUpSchema } from '../../config/validations'
+import realm from '../../services/realm'
+import { actionSignIn } from '../../actions'
 
-export default function SignUpScreen(props) {
-  const dispatch = useDispatch();
-  const [id, setId] = React.useState(1);
+export default function SignUpScreen (props) {
+  const dispatch = useDispatch()
+  const [id, setId] = React.useState(1)
 
-  React.useEffect(function() {
-    async function setUserId() {
-      const users = realm.objects('Users');
+  React.useEffect(function () {
+    async function setUserId () {
+      const users = realm.objects('Users')
       if (users.length > 0) {
-        setId(users.length + 1);
+        setId(users.length + 1)
       }
     }
-    setUserId();
-  }, []);
+    setUserId()
+  }, [])
 
-  async function _handleSignUp(values) {
+  async function _handleSignUp (values) {
     try {
       if (values) {
-        const password = Base64.encode(values.password);
+        const password = Base64.encode(values.password)
 
         const data = {
           ...values,
           password,
-          id,
-        };
+          id
+        }
 
-        realm.write(function() {
-          realm.create('Users', data);
-        });
+        realm.write(function () {
+          realm.create('Users', data)
+        })
 
-        const storage = JSON.stringify({email: values.email, id});
-        await AsyncStorage.setItem('@mytasks', storage);
+        const storage = JSON.stringify({ email: values.email, id })
+        await AsyncStorage.setItem('@mytasks', storage)
 
-        dispatch(actionSignIn({signIn: true, user: data}));
+        dispatch(actionSignIn({ signIn: true, user: data }))
       }
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert('Error', err.message)
     }
   }
 
@@ -58,10 +58,10 @@ export default function SignUpScreen(props) {
         <Form>
           <KeyboardAwareScrollView>
             <Formik
-              initialValues={{email: '', password: ''}}
+              initialValues={{ email: '', password: '' }}
               onSubmit={_handleSignUp}
               validationSchema={SignUpSchema}>
-              {({handleChange, values, handleSubmit, errors, isValid}) => (
+              {({ handleChange, values, handleSubmit, errors, isValid }) => (
                 <>
                   <FormControl>
                     <TextInput
@@ -146,5 +146,5 @@ export default function SignUpScreen(props) {
         </Form>
       </CenterContent>
     </Container>
-  );
+  )
 }

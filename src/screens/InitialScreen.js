@@ -1,46 +1,46 @@
-import React from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {createStackNavigator} from '@react-navigation/stack';
-import AsyncStorage from '@react-native-community/async-storage';
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { createStackNavigator } from '@react-navigation/stack'
+import AsyncStorage from '@react-native-community/async-storage'
 
-import {actionSignIn, actionSessionLoading} from '../actions';
+import { actionSignIn, actionSessionLoading } from '../actions'
 
-import ProfileButton from './../components/ProfileButton';
+import ProfileButton from './../components/ProfileButton'
 
-import SignInScreen from './SignInScreen';
-import SignUpScreen from './SignUpScreen';
+import SignInScreen from './SignInScreen'
+import SignUpScreen from './SignUpScreen'
 
-import HomeScreen from './HomeScreen';
-import ProfileScreen from './ProfileScreen';
+import HomeScreen from './HomeScreen'
+import ProfileScreen from './ProfileScreen'
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
-export default function InitialScreen() {
-  const dispatch = useDispatch();
-  const signIn = useSelector(state => state.signIn);
+export default function InitialScreen () {
+  const dispatch = useDispatch()
+  const signIn = useSelector(state => state.signIn)
 
   React.useEffect(
-    function() {
-      async function bootstrapAsync() {
+    function () {
+      async function bootstrapAsync () {
         try {
-          const value = await AsyncStorage.getItem('@mytasks');
-          const user = JSON.parse(value);
+          const value = await AsyncStorage.getItem('@mytasks')
+          const user = JSON.parse(value)
           if (user) {
-            dispatch(actionSignIn({signIn: true, user}));
+            dispatch(actionSignIn({ signIn: true, user }))
           } else {
-            dispatch(actionSessionLoading(false));
+            dispatch(actionSessionLoading(false))
           }
         } catch (err) {
-          console.log(err);
+          console.log(err)
         }
       }
-      bootstrapAsync();
+      bootstrapAsync()
     },
-    [dispatch],
-  );
+    [dispatch]
+  )
 
   if (signIn.isLoading) {
-    return null; /** SplashScreen */
+    return null /** SplashScreen */
   }
 
   return (
@@ -51,8 +51,8 @@ export default function InitialScreen() {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={({navigation}) => ({
-                headerRight: props => <ProfileButton {...navigation} />,
+              options={({ navigation }) => ({
+                headerRight: props => <ProfileButton {...navigation} />
               })}
             />
             <Stack.Screen name="Profile" component={ProfileScreen} />
@@ -63,19 +63,19 @@ export default function InitialScreen() {
               name="SignIn"
               component={SignInScreen}
               options={{
-                header: () => null,
+                header: () => null
               }}
             />
             <Stack.Screen
               name="SignUp"
               component={SignUpScreen}
               options={{
-                title: '',
+                title: ''
               }}
             />
           </>
         )}
       </Stack.Navigator>
     </>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-import React from 'react';
-import {Alert} from 'react-native';
-import {HelperText, TextInput, Button} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
-import {Formik} from 'formik';
-import _ from 'lodash';
-import {Base64} from 'js-base64';
+import React from 'react'
+import { Alert } from 'react-native'
+import { HelperText, TextInput, Button } from 'react-native-paper'
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-community/async-storage'
+import { Formik } from 'formik'
+import _ from 'lodash'
+import { Base64 } from 'js-base64'
 
 import {
   Container,
@@ -14,35 +14,35 @@ import {
   Footer,
   Title,
   SubTitle,
-  CenterContent,
-} from '../../config/styles';
-import {SignInSchema} from '../../config/validations';
-import {actionSignIn} from '../../actions';
-import realm from '../../services/realm';
+  CenterContent
+} from '../../config/styles'
+import { SignInSchema } from '../../config/validations'
+import { actionSignIn } from '../../actions'
+import realm from '../../services/realm'
 
 const SignInScreen = props => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-  async function _handleSignIn(values) {
+  async function _handleSignIn (values) {
     try {
       if (values) {
-        const users = realm.objects('Users');
+        const users = realm.objects('Users')
 
         const user = _.filter(users, u => {
-          const pw = Base64.decode(u.password);
-          return u.email === values.email && pw === values.password;
-        });
+          const pw = Base64.decode(u.password)
+          return u.email === values.email && pw === values.password
+        })
 
         if (user.length > 0) {
-          const storage = JSON.stringify({email: values.email, id: user[0].id});
-          await AsyncStorage.setItem('@mytasks', storage);
-          dispatch(actionSignIn({signIn: true, user: user[0]}));
+          const storage = JSON.stringify({ email: values.email, id: user[0].id })
+          await AsyncStorage.setItem('@mytasks', storage)
+          dispatch(actionSignIn({ signIn: true, user: user[0] }))
         } else {
-          Alert.alert('MyTasks', 'Datos invalidos');
+          Alert.alert('MyTasks', 'Datos invalidos')
         }
       }
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert('Error', err.message)
     }
   }
 
@@ -53,10 +53,10 @@ const SignInScreen = props => {
         <SubTitle>Por favor inicie sesión para continuar</SubTitle>
         <Form>
           <Formik
-            initialValues={{email: '', password: ''}}
+            initialValues={{ email: '', password: '' }}
             onSubmit={_handleSignIn}
             validationSchema={SignInSchema}>
-            {({handleChange, values, handleSubmit, errors, isValid}) => (
+            {({ handleChange, values, handleSubmit, errors, isValid }) => (
               <>
                 <FormControl>
                   <TextInput
@@ -100,7 +100,7 @@ const SignInScreen = props => {
         </Button>
       </Footer>
     </Container>
-  );
-};
+  )
+}
 
-export default SignInScreen;
+export default SignInScreen

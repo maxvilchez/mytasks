@@ -1,16 +1,16 @@
-import React from 'react';
-import {TouchableOpacity, Alert, Platform, ToastAndroid} from 'react-native';
+import React from 'react'
+import { TouchableOpacity, Alert, Platform, ToastAndroid } from 'react-native'
 import {
   Avatar,
   HelperText,
   IconButton,
   TextInput,
-  Button,
-} from 'react-native-paper';
-import {Formik} from 'formik';
-import {useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+  Button
+} from 'react-native-paper'
+import { Formik } from 'formik'
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-community/async-storage'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
   Container,
@@ -19,94 +19,94 @@ import {
   FullName,
   Form,
   FormControl,
-  ChangePasswordText,
-} from './styles';
-import {ProfileSchema} from '../../config/validations';
-import realm from '../../services/realm';
-import {actionSignIn} from '../../actions';
+  ChangePasswordText
+} from './styles'
+import { ProfileSchema } from '../../config/validations'
+import realm from '../../services/realm'
+import { actionSignIn } from '../../actions'
 
-const ProfileScreen = props => {
-  const dispatch = useDispatch();
-  const [profile, setProfile] = React.useState(null);
-  const [user, setUser] = React.useState(null);
+const ProfileScreen = ({ navigation }) => {
+  const dispatch = useDispatch()
+  const [profile, setProfile] = React.useState(null)
+  const [user, setUser] = React.useState(null)
 
   React.useLayoutEffect(() => {
-    async function _removeSession() {
+    async function _removeSession () {
       try {
-        await AsyncStorage.removeItem('@mytasks');
-        dispatch(actionSignIn(false));
+        await AsyncStorage.removeItem('@mytasks')
+        dispatch(actionSignIn(false))
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     }
 
-    function _logout() {
+    function _logout () {
       Alert.alert(
         'MyTasks',
         '¿Seguro que quiere cerrar sesión?',
         [
           {
             text: 'Cancelar',
-            style: 'cancel',
+            style: 'cancel'
           },
-          {text: 'Si', onPress: _removeSession},
+          { text: 'Si', onPress: _removeSession }
         ],
-        {cancelable: false},
-      );
+        { cancelable: false }
+      )
     }
-    props.navigation.setOptions({
+    navigation.setOptions({
       headerRight: () => (
         <IconButton icon="logout" size={28} onPress={_logout} />
-      ),
-    });
-  }, [dispatch, props]);
+      )
+    })
+  }, [dispatch, navigation])
 
-  React.useEffect(function() {
-    async function getProfile() {
+  React.useEffect(function () {
+    async function getProfile () {
       try {
-        const value = await AsyncStorage.getItem('@mytasks');
-        const userLoggedIn = JSON.parse(value);
+        const value = await AsyncStorage.getItem('@mytasks')
+        const userLoggedIn = JSON.parse(value)
         if (userLoggedIn) {
           const data = realm
             .objects('Users')
-            .filter(item => item.id === userLoggedIn.id);
+            .filter(item => item.id === userLoggedIn.id)
 
-          setUser(userLoggedIn);
+          setUser(userLoggedIn)
           setProfile({
             fullname: data[0].fullname,
             email: data[0].email,
             age: data[0].age,
-            phone: data[0].phone,
-          });
+            phone: data[0].phone
+          })
         }
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     }
-    getProfile();
-  }, []);
+    getProfile()
+  }, [])
 
-  async function _handleSave(values) {
+  async function _handleSave (values) {
     try {
       if (values) {
-        realm.write(function() {
-          realm.create('Users', {id: user.id, ...values}, 'modified');
-        });
+        realm.write(function () {
+          realm.create('Users', { id: user.id, ...values }, 'modified')
+        })
 
-        const storage = JSON.stringify({email: values.email, id: user.id});
-        await AsyncStorage.setItem('@mytasks', storage);
+        const storage = JSON.stringify({ email: values.email, id: user.id })
+        await AsyncStorage.setItem('@mytasks', storage)
 
         if (Platform.OS === 'android') {
           ToastAndroid.show(
             'Tus datos fueron actualizados',
-            ToastAndroid.SHORT,
-          );
+            ToastAndroid.SHORT
+          )
         } else {
-          Alert.alert('MyTasks', 'Tus datos fueron actualizados');
+          Alert.alert('MyTasks', 'Tus datos fueron actualizados')
         }
       }
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert('Error', err.message)
     }
   }
 
@@ -121,10 +121,10 @@ const ProfileScreen = props => {
           <Form>
             <Formik
               enableReinitialize
-              initialValues={profile ? profile : {}}
+              initialValues={profile || {}}
               onSubmit={_handleSave}
               validationSchema={ProfileSchema}>
-              {({handleChange, values, handleSubmit, errors, isValid}) => (
+              {({ handleChange, values, handleSubmit, errors, isValid }) => (
                 <>
                   <FormControl>
                     <TextInput
@@ -201,7 +201,7 @@ const ProfileScreen = props => {
         </Section>
       </KeyboardAwareScrollView>
     </Container>
-  );
-};
+  )
+}
 
-export default ProfileScreen;
+export default ProfileScreen
