@@ -4,9 +4,8 @@ import { TextInput, HelperText, Button } from 'react-native-paper'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
 import { Formik } from 'formik'
-import _ from 'lodash'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import {
   Container,
@@ -26,59 +25,68 @@ import {
 } from './styles'
 import realm from '../../services/realm'
 import { NewTasksSchema } from '../../config/validations'
-import { calendarFormats } from '../../config/utils'
+// import { tasksMapping } from '../../config/utils'
 
 import TaskItem from './../../components/TaskItem'
+import TasksActions from './../../redux/reducers/tasks'
+import Tasks from './../../schemas/TasksSchema'
+
+// console.tron.log(realm.path)
 
 const HomeScreen = () => {
-  const { user } = useSelector(state => state.signIn)
+  const dispatch = useDispatch()
 
+  const { user } = useSelector(state => state.sessionReducer)
+  const { tasksSection } = useSelector(state => state.tasksReducer)
+
+  const [stateFAB, setStateFAB] = React.useState(false)
   const [modal, setModal] = React.useState(false)
+
   const [date, setDate] = React.useState(new Date())
-  const [showDateTime, setShowDateTime] = React.useState(false)
-  const [tasks, setTasks] = React.useState([])
+  const [time, setTime] = React.useState(new Date())
+
+  const [showDate, setShowDate] = React.useState(false)
+  const [showTime, setShowTime] = React.useState(false)
+
+  // const [tasks, setTasks] = React.useState([])
 
   React.useLayoutEffect(() => {
     const data = realm.objects('Tasks')
     data.addListener((t, changes) => {
-      _.forEach(changes.insertions, index => {
-        const d = _.orderBy(t, ['date'], ['asc'])
-        _tasksMapping(d)
-      })
+      // if (changes.insertions.length > 0) {
+      //   _.forEach(changes.insertions, index => {
+      //     // const d = _.orderBy(t, ['scheduled_date'], ['asc'])
+      //     const d = realm.objects('Tasks').sorted('scheduled_date')
+      //     _tasksMapping(d)
+      //   })
+      // }
+      // if (changes.modifications.length > 0) {
+      //   _.forEach(changes.modifications, index => {
+      //     const d = _.orderBy(t, ['scheduled_date'], ['asc'])
+      //     _tasksMapping(d)
+      //   })
+      // }
     })
-  }, [tasks])
+  }, [tasksSection])
 
   React.useEffect(() => {
-    const data = realm.objects('Tasks').sorted('date')
-    _tasksMapping(data)
+    dispatch(TasksActions.syncTaskRequest())
+    // const data = Tasks.getTasks()
+    // if (data.length) {
+    //   const t = tasksMapping(data)
+    //   console.tron.log(t)
+    // }
     return () => {
-      data.removeAllListeners()
+      realm.removeAllListeners()
     }
   }, [])
 
-  const _tasksMapping = data => {
-    const groups = _.groupBy(data, task =>
-      moment(task.date).calendar(calendarFormats)
-    )
-
-    const tsks = []
-
-    _.forEach(groups, (value, key) => {
-      let item
-      item = _.assign(item, {
-        title: key,
-        data: groups[key]
-      })
-      tsks.push(item)
-    })
-
-    setTasks(tsks)
-  }
-
   const closeModal = () => {
-    setModal(false)
     setDate(new Date())
-    setShowDateTime(false)
+    setTime(new Date())
+    setShowDate(false)
+    setShowTime(false)
+    setModal(false)
   }
 
   const save = values => {
@@ -89,39 +97,88 @@ const HomeScreen = () => {
       id = totalTasks + 1
     }
 
+    const h = moment(time).get('hour')
+    const m = moment(time).get('minute')
+
+    const f = moment(date).set({ hour: h, minute: m })
+
     const data = {
       id,
       user_id: user.id,
-      case_num: '001',
+      status_id: 1,
+      case: '00' + id,
       description: values.description,
-      date,
+      scheduled_date: new Date(f),
+      active: false,
       create_date: new Date()
     }
 
-    realm.write(function () {
-      realm.create('Tasks', data)
-    })
+    Tasks.save(data)
+    dispatch(TasksActions.saveTaskRequest(data)) // Action
 
     closeModal()
   }
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date
-    setShowDateTime(Platform.OS === 'ios')
+    setShowDate(Platform.OS === 'ios')
     setDate(currentDate)
+  }
+
+  const onChangeTime = (event, selectedDate) => {
+    const currentDate = selectedDate || date
+    setShowTime(Platform.OS === 'ios')
+    setTime(currentDate)
+  }
+
+  const onPressCheck = id => {
+    const task = realm.objects('Tasks').filtered(`id=${id}`)
+    const data = {
+      id: task[0].id,
+      user_id: task[0].user_id,
+      status_id: task[0].status_id,
+      case: task[0].case,
+      description: task[0].description,
+      scheduled_date: task[0].scheduled_date,
+      active: task[0].active,
+      create_date: task[0].create_date
+    }
+
+    console.log(data)
+
+    // dispatch({ type: SYNC_FETCH_REQUEST, payload: data })
+  }
+
+  const syncTask = () => {
+    dispatch(TasksActions.syncTaskRequest())
   }
 
   return (
     <Container>
       <SectionList
-        sections={tasks}
+        sections={tasksSection}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => <TaskItem details={item} />}
+        renderItem={({ item }) => (
+          <TaskItem details={item} onPressCheck={onPressCheck} />
+        )}
         renderSectionHeader={({ section: { title } }) => (
           <SectionTitle>{title}</SectionTitle>
         )}
       />
-      <FAB icon="plus" onPress={() => setModal(true)} />
+      <FAB.Group
+        open={stateFAB}
+        icon={'calendar'}
+        actions={[
+          { icon: 'plus', onPress: () => setModal(true) },
+          { icon: 'sync', onPress: () => syncTask() }
+        ]}
+        onStateChange={({ open }) => setStateFAB(open)}
+        onPress={() => {
+          if (stateFAB) {
+            // do something if the speed dial is open
+          }
+        }}
+      />
       <Modal visible={modal} animationType="slide">
         <ModalContainer>
           <ModalHeader>
@@ -140,7 +197,6 @@ const HomeScreen = () => {
                       <TextInput
                         label="¿Cuáles son sus planes?"
                         mode="outlined"
-                        multiline
                         value={values.description}
                         name="description"
                         onChangeText={handleChange('description')}
@@ -150,37 +206,55 @@ const HomeScreen = () => {
                       </HelperText>
 
                       <FormControl>
-                        <Icon name="calendar-clock" size={20} />
+                        <Icon name="calendar-month" size={20} />
                         <TextButton
                           onPress={() =>
-                            setShowDateTime(() => {
+                            setShowDate(() => {
                               Keyboard.dismiss()
                               return true
                             })
                           }>
                           <TextButtonTitle>
-                            {moment(date).format('LLL')}
+                            {moment(date).format('DD-MM-YYYY')}
                           </TextButtonTitle>
                         </TextButton>
                       </FormControl>
 
-                      {showDateTime && (
+                      {showDate && (
                         <DateTimePicker
-                          testID="dateTimePicker"
+                          testID="datePicker"
                           value={date}
                           mode="datetime"
-                          is24Hour={true}
                           display="default"
                           onChange={onChangeDate}
                         />
                       )}
 
                       <FormControl>
-                        <Icon name="checkbox-multiple-marked" size={20} />
-                        <TextButton>
-                          <TextButtonTitle>Pendiente</TextButtonTitle>
+                        <Icon name="calendar-clock" size={20} />
+                        <TextButton
+                          onPress={() =>
+                            setShowTime(() => {
+                              Keyboard.dismiss()
+                              return true
+                            })
+                          }>
+                          <TextButtonTitle>
+                            {moment(time).format('h:mm a')}
+                          </TextButtonTitle>
                         </TextButton>
                       </FormControl>
+
+                      {showTime && (
+                        <DateTimePicker
+                          testID="timePicker"
+                          value={time}
+                          mode="time"
+                          is24Hour={true}
+                          display="default"
+                          onChange={onChangeTime}
+                        />
+                      )}
                       <Button onPress={handleSubmit} disabled={!isValid}>
                         Save
                       </Button>

@@ -1,11 +1,8 @@
 import React from 'react'
 import { Alert } from 'react-native'
 import { HelperText, TextInput, Button } from 'react-native-paper'
-import { useDispatch } from 'react-redux'
-import AsyncStorage from '@react-native-community/async-storage'
+import { useDispatch, useSelector } from 'react-redux'
 import { Formik } from 'formik'
-import _ from 'lodash'
-import { Base64 } from 'js-base64'
 
 import {
   Container,
@@ -17,29 +14,17 @@ import {
   CenterContent
 } from '../../config/styles'
 import { SignInSchema } from '../../config/validations'
-import { actionSignIn } from '../../actions'
-import realm from '../../services/realm'
+import SessionActions from './../../redux/reducers/session'
 
 const SignInScreen = props => {
   const dispatch = useDispatch()
 
-  async function _handleSignIn (values) {
+  const { isLoadingSession } = useSelector(state => state.sessionReducer)
+
+  function _handleSignIn(values) {
     try {
       if (values) {
-        const users = realm.objects('Users')
-
-        const user = _.filter(users, u => {
-          const pw = Base64.decode(u.password)
-          return u.email === values.email && pw === values.password
-        })
-
-        if (user.length > 0) {
-          const storage = JSON.stringify({ email: values.email, id: user[0].id })
-          await AsyncStorage.setItem('@mytasks', storage)
-          dispatch(actionSignIn({ signIn: true, user: user[0] }))
-        } else {
-          Alert.alert('MyTasks', 'Datos invalidos')
-        }
+        dispatch(SessionActions.signIn(values))
       }
     } catch (err) {
       Alert.alert('Error', err.message)
@@ -60,33 +45,36 @@ const SignInScreen = props => {
               <>
                 <FormControl>
                   <TextInput
-                    name="email"
+                    name='email'
                     value={values.email}
                     onChangeText={handleChange('email')}
-                    label="Email"
-                    mode="outlined"
-                    autoCapitalize="none"
+                    label='Email'
+                    mode='outlined'
+                    autoCapitalize='none'
                   />
-                  <HelperText type="error" visible>
+                  <HelperText type='error' visible>
                     {errors.email}
                   </HelperText>
                 </FormControl>
                 <FormControl>
                   <TextInput
-                    name="password"
+                    name='password'
                     value={values.password}
                     onChangeText={handleChange('password')}
                     maxLength={8}
                     secureTextEntry
-                    label="Contraseña"
-                    mode="outlined"
-                    keyboardType="numeric"
+                    label='Contraseña'
+                    mode='outlined'
+                    keyboardType='numeric'
                   />
-                  <HelperText type="error" visible>
+                  <HelperText type='error' visible>
                     {errors.password}
                   </HelperText>
                 </FormControl>
-                <Button onPress={handleSubmit} disabled={!isValid}>
+                <Button
+                  onPress={handleSubmit}
+                  disabled={!isValid}
+                  loading={isLoadingSession}>
                   Iniciar Sesión
                 </Button>
               </>

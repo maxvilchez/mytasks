@@ -23,7 +23,7 @@ import {
 } from './styles'
 import { ProfileSchema } from '../../config/validations'
 import realm from '../../services/realm'
-import { actionSignIn } from '../../actions'
+// import { actionSignIn } from '../../actions'
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
@@ -31,16 +31,16 @@ const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = React.useState(null)
 
   React.useLayoutEffect(() => {
-    async function _removeSession () {
+    async function _removeSession() {
       try {
         await AsyncStorage.removeItem('@mytasks')
-        dispatch(actionSignIn(false))
+        // dispatch(actionSignIn(false))
       } catch (err) {
         console.log(err)
       }
     }
 
-    function _logout () {
+    function _logout() {
       Alert.alert(
         'MyTasks',
         '¿Seguro que quiere cerrar sesión?',
@@ -56,13 +56,13 @@ const ProfileScreen = ({ navigation }) => {
     }
     navigation.setOptions({
       headerRight: () => (
-        <IconButton icon="logout" size={28} onPress={_logout} />
+        <IconButton icon='logout' size={28} onPress={_logout} />
       )
     })
   }, [dispatch, navigation])
 
   React.useEffect(function () {
-    async function getProfile () {
+    async function getProfile() {
       try {
         const value = await AsyncStorage.getItem('@mytasks')
         const userLoggedIn = JSON.parse(value)
@@ -86,7 +86,7 @@ const ProfileScreen = ({ navigation }) => {
     getProfile()
   }, [])
 
-  async function _handleSave (values) {
+  async function _handleSave(values) {
     try {
       if (values) {
         realm.write(function () {
@@ -97,10 +97,7 @@ const ProfileScreen = ({ navigation }) => {
         await AsyncStorage.setItem('@mytasks', storage)
 
         if (Platform.OS === 'android') {
-          ToastAndroid.show(
-            'Tus datos fueron actualizados',
-            ToastAndroid.SHORT
-          )
+          ToastAndroid.show('Tus datos fueron actualizados', ToastAndroid.SHORT)
         } else {
           Alert.alert('MyTasks', 'Tus datos fueron actualizados')
         }
@@ -115,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
       <KeyboardAwareScrollView>
         <Section>
           <Header>
-            <Avatar.Icon size={80} icon="account" />
+            <Avatar.Icon size={80} icon='account' />
             <FullName>{profile && profile.fullname}</FullName>
           </Header>
           <Form>
@@ -128,63 +125,63 @@ const ProfileScreen = ({ navigation }) => {
                 <>
                   <FormControl>
                     <TextInput
-                      name="fullname"
+                      name='fullname'
                       value={values.fullname}
-                      label="Nombre completo"
-                      mode="outlined"
+                      label='Nombre completo'
+                      mode='outlined'
                       onChangeText={handleChange('fullname')}
                     />
-                    <HelperText type="error" visible>
+                    <HelperText type='error' visible>
                       {errors.fullname}
                     </HelperText>
                   </FormControl>
 
                   <FormControl>
                     <TextInput
-                      name="email"
+                      name='email'
                       value={values.email}
-                      label="Email"
-                      mode="outlined"
+                      label='Email'
+                      mode='outlined'
                       onChangeText={handleChange('email')}
-                      autoCapitalize="none"
+                      autoCapitalize='none'
                     />
-                    <HelperText type="error" visible>
+                    <HelperText type='error' visible>
                       {errors.email}
                     </HelperText>
                   </FormControl>
 
                   <FormControl>
                     <TextInput
-                      name="age"
+                      name='age'
                       value={values.age}
-                      label="Edad"
-                      mode="outlined"
+                      label='Edad'
+                      mode='outlined'
                       onChangeText={handleChange('age')}
-                      keyboardType="numeric"
+                      keyboardType='numeric'
                       maxLength={2}
                     />
-                    <HelperText type="error" visible>
+                    <HelperText type='error' visible>
                       {errors.age}
                     </HelperText>
                   </FormControl>
 
                   <FormControl>
                     <TextInput
-                      name="phone"
+                      name='phone'
                       value={values.phone}
-                      label="Celular"
-                      mode="outlined"
+                      label='Celular'
+                      mode='outlined'
                       onChangeText={handleChange('phone')}
-                      keyboardType="phone-pad"
+                      keyboardType='phone-pad'
                       maxLength={9}
                     />
-                    <HelperText type="error" visible>
+                    <HelperText type='error' visible>
                       {errors.phone}
                     </HelperText>
                   </FormControl>
 
                   <FormControl>
-                    <TouchableOpacity onPress={() => {}}>
+                    <TouchableOpacity onPress={() => { }}>
                       <ChangePasswordText>
                         Cambiar contraseña
                       </ChangePasswordText>

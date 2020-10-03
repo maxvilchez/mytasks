@@ -12,18 +12,24 @@ import {
   TimeText
 } from './styles'
 
-export default function TaskItem ({ details }) {
+export default function TaskItem({ details, onPressCheck }) {
   return (
     <Container>
       <ContentLeft>
-        <Checkbox status={'checked'} />
+        <Checkbox
+          status={details.active ? 'checked' : 'indeterminate'}
+          onPress={() => onPressCheck(details.id)}
+        />
       </ContentLeft>
       <ContentRight>
         <Content>
-          <Case>{details.case_num}</Case>
+          <Case>
+            {details.case}
+            {!details.server_id && ' - sync'}
+          </Case>
           <Description numberOfLines={1}>{details.description}</Description>
         </Content>
-        <TimeText>{moment(details.date).format('LT')}</TimeText>
+        <TimeText>{moment(details.scheduled_date).format('LT')}</TimeText>
       </ContentRight>
     </Container>
   )

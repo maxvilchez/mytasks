@@ -30,31 +30,27 @@ export const ModalContainer = styled.SafeAreaView`
 export const ModalHeader = styled.View`
   width: 100%;
   position: relative;
-  padding-top: 15px;
+  padding: 20px;
 `
 
 export const ModalTitle = styled.Text`
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   text-transform: uppercase;
 `
 
 export const ModalCloseButton = styled(IconButton)`
   position: absolute;
-  top: 0;
-  right: 10px;
+  top: 5px;
+  right: 15px;
 `
 
 export const ModalBody = styled.View`
-  flex: 1;
-  padding: 15px;
+  padding: 20px;
 `
 
 export const CenterContent = styled.View`
-  flex: 1;
-  justify-content: center;
-  width: 85%;
-  margin: auto;
+  width: 100%;
 `
 
 export const Form = styled.View`

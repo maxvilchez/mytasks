@@ -1,9 +1,8 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { createStackNavigator } from '@react-navigation/stack'
-import AsyncStorage from '@react-native-community/async-storage'
 
-import { actionSignIn, actionSessionLoading } from '../actions'
+import SessionActions from './../redux/reducers/session'
 
 import ProfileButton from './../components/ProfileButton'
 
@@ -15,66 +14,56 @@ import ProfileScreen from './ProfileScreen'
 
 const Stack = createStackNavigator()
 
-export default function InitialScreen () {
+export default function InitialScreen() {
   const dispatch = useDispatch()
-  const signIn = useSelector(state => state.signIn)
+  const session = useSelector(state => state.sessionReducer)
 
   React.useEffect(
     function () {
-      async function bootstrapAsync () {
-        try {
-          const value = await AsyncStorage.getItem('@mytasks')
-          const user = JSON.parse(value)
-          if (user) {
-            dispatch(actionSignIn({ signIn: true, user }))
-          } else {
-            dispatch(actionSessionLoading(false))
-          }
-        } catch (err) {
-          console.log(err)
-        }
+      function bootstrapAsync() {
+        dispatch(SessionActions.signInValidate())
       }
       bootstrapAsync()
     },
     [dispatch]
   )
 
-  if (signIn.isLoading) {
+  if (session.isLoading) {
     return null /** SplashScreen */
   }
 
   return (
     <>
       <Stack.Navigator>
-        {signIn.isSignedIn ? (
+        {session.isSignedIn ? (
           <>
             <Stack.Screen
-              name="Home"
+              name='Home'
               component={HomeScreen}
               options={({ navigation }) => ({
                 headerRight: props => <ProfileButton {...navigation} />
               })}
             />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name='Profile' component={ProfileScreen} />
           </>
         ) : (
-          <>
-            <Stack.Screen
-              name="SignIn"
-              component={SignInScreen}
-              options={{
-                header: () => null
-              }}
-            />
-            <Stack.Screen
-              name="SignUp"
-              component={SignUpScreen}
-              options={{
-                title: ''
-              }}
-            />
-          </>
-        )}
+            <>
+              <Stack.Screen
+                name='SignIn'
+                component={SignInScreen}
+                options={{
+                  header: () => null
+                }}
+              />
+              <Stack.Screen
+                name='SignUp'
+                component={SignUpScreen}
+                options={{
+                  title: ''
+                }}
+              />
+            </>
+          )}
       </Stack.Navigator>
     </>
   )

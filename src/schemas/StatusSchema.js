@@ -9,5 +9,5 @@ export default class StatusSchema {
       create_date: 'date',
       update_date: 'date'
     }
-  };
+  }
 }
