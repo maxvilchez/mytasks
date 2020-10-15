@@ -70,7 +70,7 @@ const HomeScreen = () => {
   }, [tasksSection])
 
   React.useEffect(() => {
-    dispatch(TasksActions.syncTaskRequest())
+    // dispatch(TasksActions.syncTaskRequest())
     // const data = Tasks.getTasks()
     // if (data.length) {
     //   const t = tasksMapping(data)

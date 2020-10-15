@@ -3,6 +3,7 @@ import { Alert } from 'react-native'
 import { HelperText, TextInput, Button } from 'react-native-paper'
 import { useDispatch, useSelector } from 'react-redux'
 import { Formik } from 'formik'
+import SyncAdapter from 'react-native-sync-adapter'
 
 import {
   Container,
@@ -15,6 +16,9 @@ import {
 } from '../../config/styles'
 import { SignInSchema } from '../../config/validations'
 import SessionActions from './../../redux/reducers/session'
+
+const syncInterval = 60 // 1 minute
+const syncFlexTime = 15 // 15 seconds
 
 const SignInScreen = props => {
   const dispatch = useDispatch()
@@ -30,6 +34,13 @@ const SignInScreen = props => {
       Alert.alert('Error', err.message)
     }
   }
+
+  function _onSyncPress() {
+    SyncAdapter.syncImmediately({
+      syncInterval,
+      syncFlexTime
+    })
+  };
 
   return (
     <Container>
@@ -76,6 +87,10 @@ const SignInScreen = props => {
                   disabled={!isValid}
                   loading={isLoadingSession}>
                   Iniciar Sesión
+                </Button>
+                <Button
+                  onPress={_onSyncPress}>
+                  Sync
                 </Button>
               </>
             )}
